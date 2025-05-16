@@ -1,2 +1,9 @@
-package com.example.calenderdevelop.controller;public class ScheduleController {
+package com.example.calenderdevelop.controller;
+
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api")
+public class ScheduleController {
+
 }
