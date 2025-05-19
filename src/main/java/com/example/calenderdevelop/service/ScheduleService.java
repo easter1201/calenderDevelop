@@ -8,6 +8,6 @@ public interface ScheduleService {
     ScheduleResponse createSchedule(CreateScheduleRequest createRequest);
     ScheduleResponse getSchedule(Long scheduleId);
     List<ScheduleResponse> getAllSchedules();
-    ScheduleResponse updateSchedule(Long id, UpdateScheduleRequest updateRequest);
-    void deleteSchedule(Long id, DeleteScheduleRequest deleteRequest);
+    ScheduleResponse updateSchedule(Long scheduleId, UpdateScheduleRequest updateRequest);
+    void deleteSchedule(Long scheduleId, DeleteScheduleRequest deleteRequest);
 }

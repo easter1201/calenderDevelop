@@ -1,9 +1,14 @@
 package com.example.calenderdevelop.service;
 
-import com.example.calenderdevelop.dto.*;
+import com.example.calenderdevelop.dto.CreateScheduleRequest;
+import com.example.calenderdevelop.dto.DeleteScheduleRequest;
+import com.example.calenderdevelop.dto.ScheduleResponse;
+import com.example.calenderdevelop.dto.UpdateScheduleRequest;
 import com.example.calenderdevelop.entity.Schedule;
+import com.example.calenderdevelop.entity.User;
 import com.example.calenderdevelop.exception.EntityNotFoundException;
 import com.example.calenderdevelop.repository.ScheduleRepository;
+import com.example.calenderdevelop.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,14 +18,21 @@ import java.util.stream.Collectors;
 @Service
 public class ScheduleServiceImpl implements  ScheduleService{
     private final ScheduleRepository scheduleRepository;
+    private final UserRepository userRepository;
 
-    public ScheduleServiceImpl(ScheduleRepository scheduleRepository){
+    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, UserRepository userRepository){
         this.scheduleRepository = scheduleRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public ScheduleResponse createSchedule(CreateScheduleRequest createRequest){
-        Schedule schedule = new Schedule(createRequest.getUserName(), createRequest.getScheduleTitle(), createRequest.getScheduleContent());
+        User user = userRepository.findByUserNameAndEmail(createRequest.getUserName(), createRequest.getEmail()).orElse(null);
+        if(user == null){
+            user = new User(createRequest.getUserName(), createRequest.getEmail());
+            user = userRepository.save(user);
+        }
+        Schedule schedule = new Schedule(user, createRequest.getScheduleTitle(), createRequest.getScheduleContent());
         Schedule saved = scheduleRepository.save(schedule);
         return new ScheduleResponse(saved);
     }
@@ -43,7 +55,13 @@ public class ScheduleServiceImpl implements  ScheduleService{
     public ScheduleResponse updateSchedule(Long scheduleId, UpdateScheduleRequest updateRequest){
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException(scheduleId, Schedule.class));
-        schedule.update(updateRequest.getScheduleTitle(), updateRequest.getScheduleContent());
+        if(updateRequest.getScheduleTitle() != null) schedule.setScheduleTitle(updateRequest.getScheduleTitle());
+        if(updateRequest.getScheduleTitle() != null) schedule.setScheduleContent(updateRequest.getScheduleContent());
+
+        User user = schedule.getUser();
+        if(updateRequest.getUserName() != null) user.setUserName(updateRequest.getUserName());
+        if(updateRequest.getEmail() != null) user.setEmail(updateRequest.getEmail());
+
         return new ScheduleResponse(schedule);
     }
 

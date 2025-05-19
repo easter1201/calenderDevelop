@@ -5,6 +5,6 @@ import jakarta.validation.constraints.*;
 
 @Getter
 public class DeleteScheduleRequest {
-    @NotBlank
-    private String userName;
+    @NotNull
+    private Long userId;
 }
