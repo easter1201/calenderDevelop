@@ -14,13 +14,16 @@ public class CreateScheduleRequest {
     private String userName;
     @NotBlank
     private String email;
+    @NotBlank
+    private String password;
 
     public CreateScheduleRequest() {}
 
-    public CreateScheduleRequest(String scheduleTitle, String scheduleContent, String userName, String email){
+    public CreateScheduleRequest(String scheduleTitle, String scheduleContent, String userName, String email, String password){
         this.scheduleTitle = scheduleTitle;
         this.scheduleContent = scheduleContent;
         this.userName = userName;
         this.email = email;
+        this.password = password;
     }
 }

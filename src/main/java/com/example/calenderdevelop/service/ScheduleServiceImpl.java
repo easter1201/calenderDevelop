@@ -29,7 +29,7 @@ public class ScheduleServiceImpl implements  ScheduleService{
     public ScheduleResponse createSchedule(CreateScheduleRequest createRequest){
         User user = userRepository.findByUserNameAndEmail(createRequest.getUserName(), createRequest.getEmail()).orElse(null);
         if(user == null){
-            user = new User(createRequest.getUserName(), createRequest.getEmail());
+            user = new User(createRequest.getUserName(), createRequest.getEmail(), createRequest.getPassword());
             user = userRepository.save(user);
         }
         Schedule schedule = new Schedule(user, createRequest.getScheduleTitle(), createRequest.getScheduleContent());
