@@ -1,5 +1,6 @@
 package com.example.calenderdevelop.controller;
 
+import com.example.calenderdevelop.dto.CreateUserRequest;
 import com.example.calenderdevelop.dto.LoginRequest;
 import com.example.calenderdevelop.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -37,5 +38,11 @@ public class UserController {
         response.addCookie(cookie);
 
         return ResponseEntity.ok("logout");
+    }
+
+    @PostMapping("/sign")
+    public ResponseEntity<String> signup(@Valid @RequestBody CreateUserRequest createRequest){
+        userService.createUser(createRequest);
+        return ResponseEntity.ok("회원가입 완료");
     }
 }

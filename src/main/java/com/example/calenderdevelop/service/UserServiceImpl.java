@@ -1,5 +1,6 @@
 package com.example.calenderdevelop.service;
 
+import com.example.calenderdevelop.config.PasswordEncoder;
 import com.example.calenderdevelop.dto.CreateUserRequest;
 import com.example.calenderdevelop.dto.UpdateUserRequest;
 import com.example.calenderdevelop.dto.UserResponse;
@@ -12,13 +13,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository){
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
     @Override
     public UserResponse createUser(CreateUserRequest createRequest){
-        User user = new User(createRequest.getUserName(), createRequest.getEmail(), createRequest.getPassword());
+        String encodedPassword = passwordEncoder.encode(createRequest.getPassword());
+        User user = new User(createRequest.getUserName(), createRequest.getEmail(), encodedPassword);
         User saved = userRepository.save(user);
         return new UserResponse(saved);
     }
@@ -49,7 +53,7 @@ public class UserServiceImpl implements UserService{
     public Long login(String email, String password){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new LoginFailedException("이메일 또는 비밀번호 불일치"));
-        if(!user.getPassword().equals(password)) throw new LoginFailedException("이메일 또는 비밀번호 불일치");
+        if(!passwordEncoder.matches(password, user.getPassword())) throw new LoginFailedException("이메일 또는 비밀번호 불일치");
 
         return user.getUserId();
     }
