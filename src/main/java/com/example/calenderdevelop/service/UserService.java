@@ -7,4 +7,5 @@ public interface UserService {
     UserResponse getUser(Long userId);
     UserResponse updateUser(Long userId, UpdateUserRequest updateRequest);
     void deleteUser(Long userId);
+    Long login(String email, String password);
 }

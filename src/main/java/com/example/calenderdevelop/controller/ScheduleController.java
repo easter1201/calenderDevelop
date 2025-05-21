@@ -4,8 +4,11 @@ import com.example.calenderdevelop.dto.CreateScheduleRequest;
 import com.example.calenderdevelop.dto.DeleteScheduleRequest;
 import com.example.calenderdevelop.dto.ScheduleResponse;
 import com.example.calenderdevelop.dto.UpdateScheduleRequest;
+import com.example.calenderdevelop.exception.LoginFailedException;
 import com.example.calenderdevelop.service.ScheduleService;
 import com.example.calenderdevelop.service.ScheduleServiceImpl;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +24,9 @@ public class ScheduleController {
     }
 
     @PostMapping("/schedules")
-    public ScheduleResponse schedule(@Valid @RequestBody CreateScheduleRequest createRequest){
-        return scheduleService.createSchedule(createRequest);
+    public ScheduleResponse schedule(@Valid @RequestBody CreateScheduleRequest createRequest, HttpServletRequest request){
+        Long userId = extractUserIdFromCookie(request);
+        return scheduleService.createSchedule(createRequest, userId);
     }
 
     @GetMapping("/schedules/{scheduleId}")
@@ -36,12 +40,22 @@ public class ScheduleController {
     }
 
     @PutMapping("/schedules/{scheduleId}")
-    public ScheduleResponse updateSchedule(@PathVariable Long scheduleId, @RequestBody @Valid UpdateScheduleRequest updateRequest){
-        return scheduleService.updateSchedule(scheduleId, updateRequest);
+    public ScheduleResponse updateSchedule(@PathVariable Long scheduleId, @RequestBody @Valid UpdateScheduleRequest updateRequest, HttpServletRequest request){
+        Long userId = extractUserIdFromCookie(request);
+        return scheduleService.updateSchedule(scheduleId, updateRequest, userId);
     }
 
     @DeleteMapping("/schedules/{scheduleId}")
-    public void deleteSchedule(@PathVariable Long scheduleId, @Valid @RequestBody DeleteScheduleRequest deleteRequest){
-        scheduleService.deleteSchedule(scheduleId, deleteRequest);
+    public void deleteSchedule(@PathVariable Long scheduleId, @Valid @RequestBody DeleteScheduleRequest deleteRequest, HttpServletRequest request){
+        Long userId = extractUserIdFromCookie(request);
+        scheduleService.deleteSchedule(scheduleId, deleteRequest, userId);
+    }
+
+    private Long extractUserIdFromCookie(HttpServletRequest request){
+        if(request.getCookies() == null) throw new LoginFailedException("로그인 필요");
+        for(Cookie cookie : request.getCookies()){
+            if("userId".equals(cookie.getName())) return Long.valueOf(cookie.getValue());
+        }
+        throw new LoginFailedException("쿠키 없음");
     }
 }

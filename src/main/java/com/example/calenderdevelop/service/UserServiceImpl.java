@@ -1,8 +1,11 @@
 package com.example.calenderdevelop.service;
 
-import com.example.calenderdevelop.dto.*;
+import com.example.calenderdevelop.dto.CreateUserRequest;
+import com.example.calenderdevelop.dto.UpdateUserRequest;
+import com.example.calenderdevelop.dto.UserResponse;
 import com.example.calenderdevelop.entity.User;
 import com.example.calenderdevelop.exception.EntityNotFoundException;
+import com.example.calenderdevelop.exception.LoginFailedException;
 import com.example.calenderdevelop.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -40,5 +43,14 @@ public class UserServiceImpl implements UserService{
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
         userRepository.delete(user);
+    }
+
+    @Override
+    public Long login(String email, String password){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new LoginFailedException("이메일 또는 비밀번호 불일치"));
+        if(!user.getPassword().equals(password)) throw new LoginFailedException("이메일 또는 비밀번호 불일치");
+
+        return user.getUserId();
     }
 }

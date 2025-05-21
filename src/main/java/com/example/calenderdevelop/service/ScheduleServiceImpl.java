@@ -7,6 +7,7 @@ import com.example.calenderdevelop.dto.UpdateScheduleRequest;
 import com.example.calenderdevelop.entity.Schedule;
 import com.example.calenderdevelop.entity.User;
 import com.example.calenderdevelop.exception.EntityNotFoundException;
+import com.example.calenderdevelop.exception.UserIdMisMatchedException;
 import com.example.calenderdevelop.repository.ScheduleRepository;
 import com.example.calenderdevelop.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,11 @@ public class ScheduleServiceImpl implements  ScheduleService{
     }
 
     @Override
-    public ScheduleResponse createSchedule(CreateScheduleRequest createRequest){
-        User user = userRepository.findByUserNameAndEmail(createRequest.getUserName(), createRequest.getEmail()).orElse(null);
-        if(user == null){
-            user = new User(createRequest.getUserName(), createRequest.getEmail(), createRequest.getPassword());
-            user = userRepository.save(user);
-        }
+    @Transactional
+    public ScheduleResponse createSchedule(CreateScheduleRequest createRequest, Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
+
         Schedule schedule = new Schedule(user, createRequest.getScheduleTitle(), createRequest.getScheduleContent());
         Schedule saved = scheduleRepository.save(schedule);
         return new ScheduleResponse(saved);
@@ -52,24 +52,23 @@ public class ScheduleServiceImpl implements  ScheduleService{
 
     @Override
     @Transactional
-    public ScheduleResponse updateSchedule(Long scheduleId, UpdateScheduleRequest updateRequest){
+    public ScheduleResponse updateSchedule(Long scheduleId, UpdateScheduleRequest updateRequest, Long userId){
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException(scheduleId, Schedule.class));
+        if(!schedule.getUser().getUserId().equals(userId)) throw new UserIdMisMatchedException("본인 일정 아님");
         if(updateRequest.getScheduleTitle() != null) schedule.setScheduleTitle(updateRequest.getScheduleTitle());
-        if(updateRequest.getScheduleTitle() != null) schedule.setScheduleContent(updateRequest.getScheduleContent());
-
-        User user = schedule.getUser();
-        if(updateRequest.getUserName() != null) user.setUserName(updateRequest.getUserName());
-        if(updateRequest.getEmail() != null) user.setEmail(updateRequest.getEmail());
+        if(updateRequest.getScheduleContent() != null) schedule.setScheduleContent(updateRequest.getScheduleContent());
 
         return new ScheduleResponse(schedule);
     }
 
     @Override
     @Transactional
-    public void deleteSchedule(Long scheduleId, DeleteScheduleRequest deleteRequest){
+    public void deleteSchedule(Long scheduleId, DeleteScheduleRequest deleteRequest, Long userId){
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException(scheduleId, Schedule.class));
+        if(!schedule.getUser().getUserId().equals(userId)) throw new UserIdMisMatchedException("본인 일정 아님");
+
         scheduleRepository.delete(schedule);
     }
 }

@@ -5,9 +5,10 @@ import lombok.*;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class LoginRequest {
     @NotBlank
-    private String email;
+    private final String email;
     @NotBlank
-    private String password;
+    private final String password;
 }
