@@ -2,13 +2,16 @@ package com.example.calenderdevelop.service;
 
 import com.example.calenderdevelop.config.PasswordEncoder;
 import com.example.calenderdevelop.dto.CreateUserRequest;
+import com.example.calenderdevelop.dto.DeleteUserRequest;
 import com.example.calenderdevelop.dto.UpdateUserRequest;
 import com.example.calenderdevelop.dto.UserResponse;
 import com.example.calenderdevelop.entity.User;
 import com.example.calenderdevelop.exception.EntityNotFoundException;
 import com.example.calenderdevelop.exception.LoginFailedException;
+import com.example.calenderdevelop.exception.PasswordMisMatchedException;
 import com.example.calenderdevelop.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -20,6 +23,7 @@ public class UserServiceImpl implements UserService{
         this.passwordEncoder = passwordEncoder;
     }
     @Override
+    @Transactional
     public UserResponse createUser(CreateUserRequest createRequest){
         String encodedPassword = passwordEncoder.encode(createRequest.getPassword());
         User user = new User(createRequest.getUserName(), createRequest.getEmail(), encodedPassword);
@@ -35,17 +39,22 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    @Transactional
     public UserResponse updateUser(Long userId, UpdateUserRequest updateRequest){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
+        if(!updateRequest.getEmail().equals(user.getEmail())) throw new LoginFailedException("이메일 불일치");
+        if(!passwordEncoder.matches(updateRequest.getPassword(), user.getPassword())) throw new PasswordMisMatchedException("비밀번호 불일치");
         user.update(updateRequest.getUserName(), updateRequest.getEmail());
         return new UserResponse(user);
     }
 
     @Override
-    public void deleteUser(Long userId){
+    @Transactional
+    public void deleteUser(Long userId, DeleteUserRequest deleteRequest){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
+        if(!passwordEncoder.matches(deleteRequest.getPassword(), user.getPassword())) throw new PasswordMisMatchedException("비밀번호 불일치");
         userRepository.delete(user);
     }
 
