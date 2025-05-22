@@ -2,6 +2,7 @@ package com.example.calenderdevelop.controller;
 
 import com.example.calenderdevelop.dto.CommentResponse;
 import com.example.calenderdevelop.dto.CreateCommentRequest;
+import com.example.calenderdevelop.dto.DeleteCommentRequest;
 import com.example.calenderdevelop.dto.UpdateCommentRequest;
 import com.example.calenderdevelop.exception.LoginFailedException;
 import com.example.calenderdevelop.service.CommentService;
@@ -37,9 +38,9 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    public void deleteComment(@PathVariable Long commentId, HttpServletRequest request){
+    public void deleteComment(@PathVariable Long commentId, @Valid @RequestBody DeleteCommentRequest deleteRequest , HttpServletRequest request){
         Long userId = extractUserIdFromCookie(request);
-        commentService.deleteComment(commentId, userId);
+        commentService.deleteComment(commentId, deleteRequest, userId);
     }
 
     private Long extractUserIdFromCookie(HttpServletRequest request){

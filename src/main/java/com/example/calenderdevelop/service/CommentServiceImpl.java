@@ -1,12 +1,15 @@
 package com.example.calenderdevelop.service;
 
+import com.example.calenderdevelop.config.PasswordEncoder;
 import com.example.calenderdevelop.dto.CommentResponse;
 import com.example.calenderdevelop.dto.CreateCommentRequest;
+import com.example.calenderdevelop.dto.DeleteCommentRequest;
 import com.example.calenderdevelop.dto.UpdateCommentRequest;
 import com.example.calenderdevelop.entity.Comment;
 import com.example.calenderdevelop.entity.Schedule;
 import com.example.calenderdevelop.entity.User;
 import com.example.calenderdevelop.exception.EntityNotFoundException;
+import com.example.calenderdevelop.exception.PasswordMisMatchedException;
 import com.example.calenderdevelop.exception.UserIdMisMatchedException;
 import com.example.calenderdevelop.repository.CommentRepository;
 import com.example.calenderdevelop.repository.ScheduleRepository;
@@ -22,11 +25,13 @@ public class CommentServiceImpl implements CommentService{
     private final CommentRepository commentRepository;
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public CommentServiceImpl(CommentRepository commentRepository, ScheduleRepository scheduleRepository, UserRepository userRepository){
+    public CommentServiceImpl(CommentRepository commentRepository, ScheduleRepository scheduleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder){
         this.commentRepository = commentRepository;
         this.scheduleRepository = scheduleRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -52,19 +57,20 @@ public class CommentServiceImpl implements CommentService{
     public CommentResponse updateComment(Long commentId, Long userId, UpdateCommentRequest updateRequest){
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException(commentId, Comment.class));
-        if(!comment.getUser().getUserId().equals(userId)) throw new UserIdMisMatchedException("찾을 수 없음");
+        if(!comment.getUser().getUserId().equals(userId)) throw new UserIdMisMatchedException("작성자가 아님");
+        if(!passwordEncoder.matches(updateRequest.getPassword(), comment.getUser().getPassword())) throw new PasswordMisMatchedException("비밀번호 불일치");
 
         comment.setContent(updateRequest.getContent());
-
         return new CommentResponse(comment);
     }
 
     @Override
     @Transactional
-    public void deleteComment(Long commentId, Long userId){
+    public void deleteComment(Long commentId, DeleteCommentRequest deleteRequest, Long userId){
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException(commentId, Comment.class));
         if(!comment.getUser().getUserId().equals(userId)) throw new UserIdMisMatchedException("찾을 수 없음");
+        if(!passwordEncoder.matches(deleteRequest.getPassword(), comment.getUser().getPassword())) throw new PasswordMisMatchedException("비밀번호 불일치");
 
         commentRepository.delete(comment);
     }
