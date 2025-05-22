@@ -24,7 +24,7 @@ public class ScheduleController {
     }
 
     @PostMapping("/schedules")
-    public ScheduleResponse schedule(@Valid @RequestBody CreateScheduleRequest createRequest, HttpServletRequest request){
+    public ScheduleResponse createSchedule(@Valid @RequestBody CreateScheduleRequest createRequest, HttpServletRequest request){
         Long userId = extractUserIdFromCookie(request);
         return scheduleService.createSchedule(createRequest, userId);
     }
