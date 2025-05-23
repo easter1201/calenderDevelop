@@ -1,8 +1,12 @@
 package com.example.calenderdevelop.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -20,6 +24,9 @@ public class Schedule extends BaseEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToMany(mappedBy = "schedule")
+    private List<Comment> comments = new ArrayList<>();
+
     public Schedule(User user, String scheduleTitle, String scheduleContent){
         this.user = user;
         this.scheduleTitle = scheduleTitle;
@@ -33,4 +40,7 @@ public class Schedule extends BaseEntity{
         if(Strings.isNotBlank(scheduleContent)) this.scheduleContent = scheduleContent;
     }
 
+    public List<Comment> getComments(){
+        return comments;
+    }
 }

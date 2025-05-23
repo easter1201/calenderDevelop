@@ -1,15 +1,15 @@
 package com.example.calenderdevelop.controller;
 
-import com.example.calenderdevelop.dto.CreateScheduleRequest;
-import com.example.calenderdevelop.dto.DeleteScheduleRequest;
-import com.example.calenderdevelop.dto.ScheduleResponse;
-import com.example.calenderdevelop.dto.UpdateScheduleRequest;
+import com.example.calenderdevelop.dto.*;
 import com.example.calenderdevelop.exception.LoginFailedException;
 import com.example.calenderdevelop.service.ScheduleService;
 import com.example.calenderdevelop.service.ScheduleServiceImpl;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,8 +35,9 @@ public class ScheduleController {
     }
 
     @GetMapping("/schedules")
-    public List<ScheduleResponse> getAllSchedules(){
-        return scheduleService.getAllSchedules();
+    public List<PagedScheduleResponse> getAllSchedules(@RequestParam(defaultValue = "0")int page, @RequestParam(defaultValue = "10") int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt"));
+        return scheduleService.getAllSchedules(pageable).getContent();
     }
 
     @PutMapping("/schedules/{scheduleId}")

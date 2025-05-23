@@ -1,20 +1,16 @@
 package com.example.calenderdevelop.service;
 
-import com.example.calenderdevelop.dto.CreateScheduleRequest;
-import com.example.calenderdevelop.dto.DeleteScheduleRequest;
-import com.example.calenderdevelop.dto.ScheduleResponse;
-import com.example.calenderdevelop.dto.UpdateScheduleRequest;
+import com.example.calenderdevelop.dto.*;
 import com.example.calenderdevelop.entity.Schedule;
 import com.example.calenderdevelop.entity.User;
 import com.example.calenderdevelop.exception.EntityNotFoundException;
 import com.example.calenderdevelop.exception.UserIdMisMatchedException;
 import com.example.calenderdevelop.repository.ScheduleRepository;
 import com.example.calenderdevelop.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ScheduleServiceImpl implements  ScheduleService{
@@ -45,9 +41,9 @@ public class ScheduleServiceImpl implements  ScheduleService{
     }
 
     @Override
-    public List<ScheduleResponse> getAllSchedules(){
-        return scheduleRepository.findAll().stream()
-                .map(ScheduleResponse::new).collect(Collectors.toList());
+    public Page<PagedScheduleResponse> getAllSchedules(Pageable pageable){
+        return scheduleRepository.findAll(pageable)
+                .map(PagedScheduleResponse::new);
     }
 
     @Override
