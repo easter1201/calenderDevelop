@@ -23,7 +23,7 @@ public class User extends BaseEntity{
         this.password = password;
     }
 
-    public void update(String userName, String email){
+    public void update(String userName, String email){ //유저 수정에 사용
         this.userName = userName;
         this.email = email;
     }

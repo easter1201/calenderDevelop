@@ -20,30 +20,30 @@ public class CommentController {
 
     public CommentController(CommentService commentService){this.commentService = commentService;}
 
-    @PostMapping("/{scheduleId}")
+    @PostMapping("/{scheduleId}") //댓글 등록
     public CommentResponse createComment(@PathVariable Long scheduleId, @Valid @RequestBody CreateCommentRequest createRequest, HttpServletRequest request){
         Long userId = extractUserIdFromCookie(request);
         return commentService.createComment(scheduleId, userId, createRequest);
     }
 
-    @GetMapping("/{scheduleId}")
+    @GetMapping("/{scheduleId}") //댓글 조회
     public List<CommentResponse> getComments(@PathVariable Long scheduleId){
         return commentService.findAllBySchedule(scheduleId);
     }
 
-    @PutMapping("/{commentId}")
+    @PutMapping("/{commentId}") //댓글 수정
     public CommentResponse updateComment(@PathVariable Long commentId, @Valid @RequestBody UpdateCommentRequest updateRequest, HttpServletRequest request){
         Long userId = extractUserIdFromCookie(request);
         return commentService.updateComment(commentId, userId, updateRequest);
     }
 
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping("/{commentId}") //댓글 삭제
     public void deleteComment(@PathVariable Long commentId, @Valid @RequestBody DeleteCommentRequest deleteRequest , HttpServletRequest request){
         Long userId = extractUserIdFromCookie(request);
         commentService.deleteComment(commentId, deleteRequest, userId);
     }
 
-    private Long extractUserIdFromCookie(HttpServletRequest request){
+    private Long extractUserIdFromCookie(HttpServletRequest request){ //쿠키값에서 userId 추출
         if(request.getCookies() == null) throw new LoginFailedException("로그인 필요");
         for(Cookie cookie : request.getCookies()){
             if("userId".equals(cookie.getName())) return Long.valueOf(cookie.getValue());

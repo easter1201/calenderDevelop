@@ -24,7 +24,7 @@ public class ScheduleServiceImpl implements  ScheduleService{
 
     @Override
     @Transactional
-    public ScheduleResponse createSchedule(CreateScheduleRequest createRequest, Long userId){
+    public ScheduleResponse createSchedule(CreateScheduleRequest createRequest, Long userId){ //유저ID를 파라미터로 받아 일정 생성
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
 
@@ -34,21 +34,21 @@ public class ScheduleServiceImpl implements  ScheduleService{
     }
 
     @Override
-    public ScheduleResponse getSchedule(Long scheduleId){
+    public ScheduleResponse getSchedule(Long scheduleId){ //일정ID를 파라미터로 받아 해당 일정 조회
         final Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException(scheduleId, Schedule.class));
         return new ScheduleResponse(schedule);
     }
 
     @Override
-    public Page<PagedScheduleResponse> getAllSchedules(Pageable pageable){
+    public Page<PagedScheduleResponse> getAllSchedules(Pageable pageable){ //전체 일정 조회(페이지네이션)
         return scheduleRepository.findAll(pageable)
                 .map(PagedScheduleResponse::new);
     }
 
     @Override
     @Transactional
-    public ScheduleResponse updateSchedule(Long scheduleId, UpdateScheduleRequest updateRequest, Long userId){
+    public ScheduleResponse updateSchedule(Long scheduleId, UpdateScheduleRequest updateRequest, Long userId){ //일정ID, 유저ID를 파라미터로 받아 해당 일정 수정
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException(scheduleId, Schedule.class));
         if(!schedule.getUser().getUserId().equals(userId)) throw new UserIdMisMatchedException("본인 일정 아님");
@@ -60,7 +60,7 @@ public class ScheduleServiceImpl implements  ScheduleService{
 
     @Override
     @Transactional
-    public void deleteSchedule(Long scheduleId, DeleteScheduleRequest deleteRequest, Long userId){
+    public void deleteSchedule(Long scheduleId, DeleteScheduleRequest deleteRequest, Long userId){ //일정ID, 유저ID를 파라미터로 받아 해당 일정 사제
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException(scheduleId, Schedule.class));
         if(!schedule.getUser().getUserId().equals(userId)) throw new UserIdMisMatchedException("본인 일정 아님");

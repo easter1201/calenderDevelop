@@ -36,7 +36,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public CommentResponse createComment(Long scheduleId, Long userId, CreateCommentRequest createRequest){
+    public CommentResponse createComment(Long scheduleId, Long userId, CreateCommentRequest createRequest){ //일정ID, 유저ID를 파라미터로 받아 일정 저장
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new EntityNotFoundException(scheduleId, Schedule.class));
         User user = userRepository.findById(userId)
@@ -47,14 +47,14 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public List<CommentResponse> findAllBySchedule(Long scheduleId){
+    public List<CommentResponse> findAllBySchedule(Long scheduleId){ //일정 ID를 파라미터로 받아 해당 일정에 속한 댓글 전체 조회
         return commentRepository.findAllBySchedule_ScheduleId(scheduleId).stream()
                 .map(CommentResponse::new).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public CommentResponse updateComment(Long commentId, Long userId, UpdateCommentRequest updateRequest){
+    public CommentResponse updateComment(Long commentId, Long userId, UpdateCommentRequest updateRequest){ //댓글ID, 유저ID를 파라미터로 받아 해당 댓글 수정
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException(commentId, Comment.class));
         if(!comment.getUser().getUserId().equals(userId)) throw new UserIdMisMatchedException("작성자가 아님");
@@ -66,7 +66,7 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     @Transactional
-    public void deleteComment(Long commentId, DeleteCommentRequest deleteRequest, Long userId){
+    public void deleteComment(Long commentId, DeleteCommentRequest deleteRequest, Long userId){ //댓글ID, 유저ID를 파라미터로 받아 해당 댓글 삭제
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException(commentId, Comment.class));
         if(!comment.getUser().getUserId().equals(userId)) throw new UserIdMisMatchedException("찾을 수 없음");

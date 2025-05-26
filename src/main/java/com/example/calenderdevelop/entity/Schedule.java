@@ -24,7 +24,7 @@ public class Schedule extends BaseEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "schedule")
+    @OneToMany(mappedBy = "schedule") //해당 일정에 종속된 댓글
     private List<Comment> comments = new ArrayList<>();
 
     public Schedule(User user, String scheduleTitle, String scheduleContent){

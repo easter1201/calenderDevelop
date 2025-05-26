@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService{
     }
     @Override
     @Transactional
-    public UserResponse createUser(CreateUserRequest createRequest){
+    public UserResponse createUser(CreateUserRequest createRequest){ //유저 회원가입
         String encodedPassword = passwordEncoder.encode(createRequest.getPassword());
         User user = new User(createRequest.getUserName(), createRequest.getEmail(), encodedPassword);
         User saved = userRepository.save(user);
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserResponse getUser(Long userId){
+    public UserResponse getUser(Long userId){ //유저 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
         return new UserResponse(user);
@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public UserResponse updateUser(Long userId, UpdateUserRequest updateRequest){
+    public UserResponse updateUser(Long userId, UpdateUserRequest updateRequest){ //유저ID를 파라미터로 받아 해당 유저명 수정
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
         if(!updateRequest.getEmail().equals(user.getEmail())) throw new LoginFailedException("이메일 불일치");
@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public void deleteUser(Long userId, DeleteUserRequest deleteRequest){
+    public void deleteUser(Long userId, DeleteUserRequest deleteRequest){ //유저ID를 파라미터로 받아 해당 유저 삭제
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(userId, User.class));
         if(!passwordEncoder.matches(deleteRequest.getPassword(), user.getPassword())) throw new PasswordMisMatchedException("비밀번호 불일치");
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Long login(String email, String password){
+    public Long login(String email, String password){ //이메일을 파라미터로 받아 로그인 기능 구현
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new LoginFailedException("이메일 또는 비밀번호 불일치"));
         if(!passwordEncoder.matches(password, user.getPassword())) throw new LoginFailedException("이메일 또는 비밀번호 불일치");

@@ -23,30 +23,30 @@ public class ScheduleController {
         this.scheduleService = scheduleService;
     }
 
-    @PostMapping("/schedules")
+    @PostMapping("/schedules") //일정 등록
     public ScheduleResponse createSchedule(@Valid @RequestBody CreateScheduleRequest createRequest, HttpServletRequest request){
         Long userId = extractUserIdFromCookie(request);
         return scheduleService.createSchedule(createRequest, userId);
     }
 
-    @GetMapping("/schedules/{scheduleId}")
+    @GetMapping("/schedules/{scheduleId}") //일정 조회
     public ScheduleResponse getSchedule(@PathVariable Long scheduleId){
         return scheduleService.getSchedule(scheduleId);
     }
 
-    @GetMapping("/schedules")
+    @GetMapping("/schedules") //일정 전체 조회
     public List<PagedScheduleResponse> getAllSchedules(@RequestParam(defaultValue = "0")int page, @RequestParam(defaultValue = "10") int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt"));
         return scheduleService.getAllSchedules(pageable).getContent();
     }
 
-    @PutMapping("/schedules/{scheduleId}")
+    @PutMapping("/schedules/{scheduleId}") //일정 수정
     public ScheduleResponse updateSchedule(@PathVariable Long scheduleId, @RequestBody @Valid UpdateScheduleRequest updateRequest, HttpServletRequest request){
         Long userId = extractUserIdFromCookie(request);
         return scheduleService.updateSchedule(scheduleId, updateRequest, userId);
     }
 
-    @DeleteMapping("/schedules/{scheduleId}")
+    @DeleteMapping("/schedules/{scheduleId}") //일정 제거
     public void deleteSchedule(@PathVariable Long scheduleId, @Valid @RequestBody DeleteScheduleRequest deleteRequest, HttpServletRequest request){
         Long userId = extractUserIdFromCookie(request);
         scheduleService.deleteSchedule(scheduleId, deleteRequest, userId);

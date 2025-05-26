@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/login")
+    @PostMapping("/login") //로그인
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response){
         Long userId = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
 
@@ -36,7 +36,7 @@ public class UserController {
         return ResponseEntity.ok("login");
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/logout") //로그아웃
     public ResponseEntity<String> logout(HttpServletResponse response){
         Cookie cookie = new Cookie("userId", null);
         cookie.setMaxAge(0);
@@ -46,20 +46,20 @@ public class UserController {
         return ResponseEntity.ok("logout");
     }
 
-    @PostMapping("/sign")
+    @PostMapping("/sign") //회원가입(유저 등록)
     public ResponseEntity<String> signup(@Valid @RequestBody CreateUserRequest createRequest){
         userService.createUser(createRequest);
         return ResponseEntity.ok("회원가입 완료");
     }
 
-    @PutMapping("/rename")
+    @PutMapping("/rename") //유저명 수정
     public ResponseEntity<String> reName(@Valid @RequestBody UpdateUserRequest updateRequest, HttpServletRequest request){
         Long userId = extractUserIdFromCookie(request);
         userService.updateUser(userId, updateRequest);
         return ResponseEntity.ok("수정 완료");
     }
 
-    @DeleteMapping("/quit")
+    @DeleteMapping("/quit") //유저 삭제(회원 탈퇴)
     public ResponseEntity<String> quit(@Valid @RequestBody DeleteUserRequest deleteRequest, HttpServletRequest request){
         Long userId = extractUserIdFromCookie(request);
         userService.deleteUser(userId, deleteRequest);
